@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "fullname" . }}-zabbix-web
+spec:
+  scaleTargetRef:
+    apiVersion: v1
+    kind: ReplicationController
+    name: {{ template "fullname" . }}-zabbix-web
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 70

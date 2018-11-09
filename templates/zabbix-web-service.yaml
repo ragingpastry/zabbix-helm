@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "fullname" . }}-web
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    name: {{ template "fullname" . }}-web
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+    name: {{ template "fullname" . }}-web-http
+  - port: 443
+    targetPort: 443
+    name: {{ template "fullname" . }}-web-https
+  selector:
+    name: {{ template "fullname" . }}-web
+  externalIPs:
+  - "{{ .Values.Web.ExternalIP }}"

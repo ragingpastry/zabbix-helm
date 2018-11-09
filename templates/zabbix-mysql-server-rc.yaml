@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: {{ template "fullname" . }}-mysql-server
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    tier: mysql-server
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: {{ template "fullname" . }}-mysql-server
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        tier: mysql-server
+    spec:
+      volumes:
+       - name: {{ template "fullname" . }}-zabbix-mysql-data
+         persistentVolumeClaim:
+          claimName: {{ template "fullname" . }}-zabbix-mysql-data-claim
+      containers:
+        - name: {{ template "fullname" . }}-zabbix-db
+          image: mysql:5.7
+          ports:
+          - containerPort: 3306
+            name: {{ template "fullname" . }}-mysql
+          env:
+          - name: MYSQL_USER
+            valueFrom:
+             secretKeyRef:
+              name: {{ template "fullname" . }}-db-secret
+              key: db-zbx-user
+          - name: MYSQL_PASSWORD
+            valueFrom:
+             secretKeyRef:
+              name: {{ template "fullname" . }}-db-secret
+              key: db-zbx-pass
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+             secretKeyRef:
+              name: {{ template "fullname" . }}-db-secret
+              key: db-root-pass
+          - name: MYSQL_DATABASE
+            value: "zabbix"
+          volumeMounts:
+           - mountPath: "/var/lib/mysql/"
+             {{ template "fullname" . }}-name: zabbix-mysql-data
+             readOnly: false
